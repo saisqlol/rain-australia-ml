@@ -112,15 +112,17 @@ def plot_series(daily: pd.Series, y: pd.Series) -> None:
 
 
 def stationarity_tests(y: pd.Series) -> pd.DataFrame:
-    """ADF (H0: raiz unitária) e KPSS (H0: estacionária) na série e na
-    série dessazonalizada por STL."""
+    """ADF (H0: raiz unitária), KPSS de nível e KPSS com tendência
+    (H0: estacionária) na série e na série dessazonalizada por STL."""
     stl = STL(y, period=cfg.SEASON_PERIOD, robust=True).fit()
     rows = {}
     for name, s in [("Série original", y), ("Dessazonalizada (STL)", y - stl.seasonal)]:
         adf = adfuller(s, autolag="AIC")
-        kp = kpss(s, regression="c", nlags="auto")
+        kp = kpss(s, regression="c", nlags="auto")      # H0: estacionária em nível
+        kpt = kpss(s, regression="ct", nlags="auto")    # H0: estacionária em torno de tendência
         rows[name] = {"ADF estat.": adf[0], "ADF p-valor": adf[1],
-                      "KPSS estat.": kp[0], "KPSS p-valor": kp[1]}
+                      "KPSS estat.": kp[0], "KPSS p-valor": kp[1],
+                      "KPSS-ct estat.": kpt[0], "KPSS-ct p-valor": kpt[1]}
     tab = pd.DataFrame(rows).T
     save_table(tab, "tab_estacionariedade", float_fmt="{:.3f}")
     return tab
