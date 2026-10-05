@@ -1,0 +1,5 @@
+Modelo,Melhores hiperparâmetros,AUC (busca),Amostra
+Regressão Logística,C=0.1,0.8729856419536096,116 mil
+KNN,"k=61, pesos=distance",0.875414373100167,40 mil
+Random Forest,"min_folha=1, max_feat=0.4, prof.=None",0.8872733110714348,40 mil
+LightGBM,"lambda=1.0, folhas=127, árvores=1000, min_filhos=50, eta=0.02, colsample=0.6",0.897214220165833,40 mil

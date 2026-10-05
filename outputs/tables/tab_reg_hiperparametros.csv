@@ -1,0 +1,6 @@
+,Configuração,RMSE val
+SARIMAX,"ARMA(1,1) + Fourier K=2, tendência=ct",1.6347199254499767
+Prophet,"Fourier anual N=3, tau=0.001, sigma_s=10.0",1.5382600465506042
+STL,"STL(janela=53), suav.=3 + ARIMA(0,1,1), tendência=n",1.5962592034010434
+Combinado,"Média simples de SARIMAX, Prophet e STL",1.5617928450809098
+Ingênuo sazonal,y(t+h)=y(t+h-52); 1 passo: y(t+1)=y(t),2.253807174935256

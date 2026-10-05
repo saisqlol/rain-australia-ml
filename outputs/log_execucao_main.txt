@@ -1,0 +1,114 @@
+==============================================================================
+1. DADOS
+==============================================================================
+[data] Arquivo já existe: weatherAUS.csv
+145,460 linhas x 23 colunas
+==============================================================================
+2. ANÁLISE EXPLORATÓRIA
+==============================================================================
+  n_linhas: 145460
+  n_colunas: 23
+  n_estacoes: 49
+  data_inicio: 2007-11-01 00:00:00
+  data_fim: 2017-06-25 00:00:00
+  n_numericas: 16
+  n_categoricas: 6
+  pct_celulas_faltantes: 10.259745694319072
+  pct_linhas_completas: 38.78729547641964
+  checagens: {'Linhas duplicadas (Date, Location)': 0, 'MinTemp > MaxTemp': 0, 'Umidade fora de [0, 100]': 0, 'Precipitação negativa': 0, 'Nebulosidade > 8 oitavos': 3, 'RainToday incoerente com Rainfall > 1 mm': 0, 'RainTomorrow(t) diferente de RainToday(t+1)': 0, 'Datas faltantes no calendário (estação-dia)': 4112}
+  estacoes_sem_sunshine: 19
+  estacoes_sem_evaporation: 16
+  pct_rain_tomorrow: 22.418121848473554
+==============================================================================
+3. REGRESSÃO - temperatura máxima semanal (Sydney)
+==============================================================================
+[SARIMAX] melhor (AIC): {'order': (1, 0, 1), 'K': 2, 'trend': 'ct'}  AIC = 1400.9  RMSE val = 1.635
+[Prophet] melhor: {'fourier_order': 3, 'changepoint_prior_scale': 0.001, 'seasonality_prior_scale': 10.0}  RMSE val = 1.538
+[STL] melhor: {'seasonal': 53, 'smooth': 3, 'order': (0, 1, 1), 'trend': 'n'}  RMSE val = 1.596
+== Teste: longo prazo (h = 1..78) ==
+                   RMSE    MAE  MAPE (%)     R2  Cobertura IC95 (%)
+SARIMAX          1.651  1.313     5.486  0.817              93.590
+Prophet          1.665  1.333     5.478  0.814              97.436
+STL              1.814  1.448     5.928  0.780              93.590
+Combinado        1.681  1.341     5.525  0.811              96.154
+Ingênuo sazonal  2.116  1.728     7.159  0.700             100.000
+== Teste: um passo à frente ==
+                RMSE    MAE  MAPE (%)     R2  Cobertura IC95 (%)
+SARIMAX       1.593  1.290     5.398  0.830              94.872
+Prophet       1.640  1.352     5.632  0.820              96.154
+STL           1.735  1.436     6.027  0.798              92.308
+Combinado     1.633  1.338     5.597  0.821              94.872
+Persistência  2.031  1.578     6.649  0.724              94.872
+== Backtest (h = 52) ==
+                  RMSE 2012  RMSE 2013  RMSE 2014  RMSE 2015  Média     DP
+modelo                                                                   
+SARIMAX              1.364      1.874      1.861      1.635  1.684  0.239
+Prophet              1.386      1.776      1.888      1.538  1.647  0.227
+STL                  1.765      1.806      1.973      1.596  1.785  0.155
+Combinado            1.443      1.798      1.888      1.562  1.673  0.206
+Ingênuo sazonal      2.694      2.303      2.565      2.254  2.454  0.210
+== Diebold-Mariano (1 passo) ==
+                  DM  p-valor
+Prophet      -1.298    0.198
+STL          -2.140    0.036
+Combinado    -1.410    0.163
+Persistência -2.453    0.016
+== Resíduos ==
+            Média  p t (média=0)  p Ljung-Box(10)  p Ljung-Box(52)  p Jarque-Bera  p Shapiro-Wilk  p ARCH-LM(10)
+SARIMAX    0.013          0.886            0.595            0.260            0.0           0.001          0.747
+Prophet   -0.027          0.761            0.000            0.000            0.0           0.002          0.925
+STL        0.023          0.797            0.600            0.052            0.0           0.000          0.942
+Combinado  0.003          0.976            0.596            0.162            0.0           0.000          0.942
+==============================================================================
+4. CLASSIFICAÇÃO - RainTomorrow
+==============================================================================
+{'n_total': 142193, 'n_removidas_alvo': 3267, 'n_treino': 116219, 'n_teste': 25974, 'n_features': 41, 'pos_treino': 0.2231218647553326, 'pos_teste': 0.22892122892122893}
+[Regressão Logística] {'C': 0.1}  AUC=0.8730  (16s)
+[KNN] {'n_neighbors': 61, 'weights': 'distance'}  AUC=0.8754  (41s)
+[Random Forest] {'min_samples_leaf': 1, 'max_features': 0.4, 'max_depth': None}  AUC=0.8873  (334s)
+[LightGBM] {'reg_lambda': 1.0, 'num_leaves': 127, 'n_estimators': 1000, 'min_child_samples': 50, 'learning_rate': 0.02, 'colsample_bytree': 0.6}  AUC=0.8972  (147s)
+[CV] Regressão Logística: 5s
+[CV] KNN: 31s
+[CV] Random Forest: 417s
+[CV] LightGBM: 75s
+[Teste] Regressão Logística: AUC=0.8621 F1=0.6351 (6s)
+[Teste] KNN: AUC=0.8669 F1=0.6423 (13s)
+[Teste] Random Forest: AUC=0.8796 F1=0.6619 (112s)
+[Teste] LightGBM: AUC=0.8888 F1=0.6737 (23s)
+                           ROC-AUC         PR-AUC  ...       Precisão  Acurácia bal.
+Regressão Logística  0.873 ± 0.003  0.702 ± 0.006  ...  0.528 ± 0.004  0.788 ± 0.004
+KNN                  0.884 ± 0.002  0.728 ± 0.003  ...  0.796 ± 0.004  0.711 ± 0.002
+Random Forest        0.898 ± 0.002  0.748 ± 0.005  ...  0.788 ± 0.007  0.732 ± 0.002
+LightGBM             0.908 ± 0.002  0.776 ± 0.005  ...  0.627 ± 0.009  0.818 ± 0.002
+[4 rows x 6 columns]
+                     Limiar  Acurácia  ...  AUC IC95 inf  AUC IC95 sup
+Regressão Logística  0.6038    0.8244  ...        0.8564        0.8673
+KNN                  0.2818    0.8247  ...        0.8618        0.8718
+Random Forest        0.3167    0.8370  ...        0.8747        0.8842
+LightGBM             0.5706    0.8431  ...        0.8842        0.8933
+[4 rows x 11 columns]
+    limiar = 0,50  limiar ótimo = 0,57
+VN          16987                17692
+FP           3041                 2336
+FN           1428                 1739
+VP           4518                 4207
+                   media        dp
+Humidity3pm     0.042890  0.001666
+WindGustSpeed   0.031239  0.001227
+Location        0.011208  0.000977
+Pressure3pm     0.011054  0.000735
+Sunshine        0.010718  0.000837
+dPressure_24h   0.008059  0.000900
+dPressure_9a15  0.007422  0.000912
+doy_cos         0.006153  0.000576
+Humidity9am     0.003794  0.000935
+TempRange       0.003696  0.000728
+==============================================================================
+5. RELATÓRIO
+==============================================================================
+-- IEEEtran.bst version 1.14 (2015/08/26) by Michael Shell.
+-- http://www.michaelshell.org/tex/ieeetran/bibtex/
+-- See the "IEEEtran_bst_HOWTO.pdf" manual for usage information.
+Done.
+[report] PDF gerado
+Concluído em 24.9 min.

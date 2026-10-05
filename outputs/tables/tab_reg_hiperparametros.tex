@@ -1,0 +1,11 @@
+\begin{tabular}{llr}
+\toprule
+ & Configuração & RMSE val \\
+\midrule
+SARIMAX & ARMA(1,1) + Fourier K=2, tendência=ct & 1,63 \\
+Prophet & Fourier anual N=3, tau=0.001, sigma\_s=10.0 & 1,54 \\
+STL & STL(janela=53), suav.=3 + ARIMA(0,1,1), tendência=n & 1,60 \\
+Combinado & Média simples de SARIMAX, Prophet e STL & 1,56 \\
+Ingênuo sazonal & y(t+h)=y(t+h-52); 1 passo: y(t+1)=y(t) & 2,25 \\
+\bottomrule
+\end{tabular}

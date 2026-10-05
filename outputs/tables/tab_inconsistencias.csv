@@ -1,0 +1,9 @@
+,Ocorrências
+"Linhas duplicadas (Date, Location)",0
+MinTemp > MaxTemp,0
+"Umidade fora de [0, 100]",0
+Precipitação negativa,0
+Nebulosidade > 8 oitavos,3
+RainToday incoerente com Rainfall > 1 mm,0
+RainTomorrow(t) diferente de RainToday(t+1),0
+Datas faltantes no calendário (estação-dia),4112
