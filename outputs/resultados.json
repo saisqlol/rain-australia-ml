@@ -34,19 +34,27 @@
     "estacionariedade": {
       "ADF estat.": {
         "Série original": -7.450542228395077,
-        "Dessazonalizada (STL)": -11.131884460830479
+        "Dessazonalizada (STL)": -11.13188446083048
       },
       "ADF p-valor": {
         "Série original": 5.685992654819807e-11,
         "Dessazonalizada (STL)": 3.26667305238155e-20
       },
       "KPSS estat.": {
-        "Série original": 0.07376674544345607,
-        "Dessazonalizada (STL)": 1.0260800560576133
+        "Série original": 0.073766745443456,
+        "Dessazonalizada (STL)": 1.026080056057613
       },
       "KPSS p-valor": {
         "Série original": 0.1,
         "Dessazonalizada (STL)": 0.01
+      },
+      "KPSS-ct estat.": {
+        "Série original": 0.0215848857919698,
+        "Dessazonalizada (STL)": 0.1172809517219829
+      },
+      "KPSS-ct p-valor": {
+        "Série original": 0.1,
+        "Dessazonalizada (STL)": 0.1
       }
     },
     "forca": {

@@ -1,4 +1,4 @@
-# Testado com Python 3.13
+# Testado com Python 3.13 (versões usadas na execução entre parênteses)
 numpy>=1.26          # (2.5.3)
 pandas>=2.2          # (3.0.5)
 scipy>=1.11          # (1.18.1)

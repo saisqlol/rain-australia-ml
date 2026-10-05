@@ -217,7 +217,8 @@ Na série original, o teste ADF~\cite{dickey1979adf} rejeita a raiz unitária e 
 KPSS~\cite{kwiatkowski1992kpss} não rejeita a estacionariedade (Tabela~\ref{tab:estac}), o que
 indica $d=0$. Na série dessazonalizada, o ADF continua rejeitando a raiz unitária, mas o KPSS de
 nível rejeita a estacionariedade. Esse conflito é típico de uma série estacionária em torno de
-uma tendência: aponta uma variação lenta de nível e motiva testar um termo de tendência
+uma tendência, o que se confirma com o KPSS com tendência, que não rejeita a estacionariedade
+($p\ge0{,}10$). Isso aponta uma variação lenta de nível e motiva testar um termo de tendência
 determinística. A decomposição STL (Fig.~\ref{fig:stl}) mostra
 sazonalidade dominante, com força $F_S = \max\{0,\,1-\mathrm{Var}(R)/\mathrm{Var}(S+R)\}
 \approx 0{,}81$~\cite{wang2006characteristic,hyndman2021fpp3}, e tendência fraca ($F_T\approx 0{,}09$).
@@ -225,7 +226,8 @@ sazonalidade dominante, com força $F_S = \max\{0,\,1-\mathrm{Var}(R)/\mathrm{Va
 \begin{table}[!t]
 \centering
 \caption{Testes de estacionariedade (treino e validação, 2008--2015). Os p-valores do KPSS são
-limitados à faixa da tabela de interpolação: 0,100 significa $p\ge0{,}10$ e 0,010, $p\le0{,}01$.}
+limitados à faixa da tabela de interpolação: 0,100 significa $p\ge0{,}10$ e 0,010, $p\le0{,}01$.
+KPSS: estacionariedade em nível; KPSS-ct: estacionariedade em torno de tendência linear.}
 \label{tab:estac}
 \tabfont
 \resizebox{\columnwidth}{!}{\input{tables/tab_estacionariedade.tex}}
@@ -364,7 +366,8 @@ resumem os resultados. No teste, o SARIMAX teve o menor erro nos dois cenários 
 1,65\,°C e 1,59\,°C; $R^2$ de 0,82 e 0,83), seguido pelo Prophet e pela combinação. Todos
 superaram as referências ingênuas; o melhor modelo reduziu o RMSE em 22\%. As coberturas
 empíricas dos intervalos de 95\% ficaram entre 92\% e 97\%, coberturas compatíveis com o nível
-nominal (com 78 semanas, o erro-padrão de uma cobertura de 95\% é de cerca de 2,5 pontos percentuais).
+nominal (com 78 semanas independentes, o erro-padrão de uma cobertura de 95\% seria de cerca de 2,5 pontos
+percentuais; como os erros de previsão são autocorrelacionados, a incerteza real é maior).
 
 \begin{table}[!t]
 \centering
@@ -407,7 +410,8 @@ de pequenas amostras~\cite{harvey1997testing} aplicada aos erros um passo à fre
 (Tabela~\ref{tab:dm}), mostra que, a 5\% e sem correção para múltiplas comparações, o SARIMAX é
 significativamente melhor que a persistência
 ($p=0{,}016$) e que a STL ($p=0{,}036$), mas não se distingue do Prophet ($p=0{,}20$) nem da
-combinação ($p=0{,}16$). O \textit{backtest} confirma esse empate técnico: as médias dos quatro
+combinação ($p=0{,}16$). Com correção de Bonferroni para as quatro comparações ($\alpha=0{,}0125$),
+nenhuma diferença seria significativa. O \textit{backtest} confirma esse empate técnico: as médias dos quatro
 modelos ficam entre 1,65 e 1,78\,°C, contra 2,45\,°C do ingênuo, e o ranking muda de ano para
 ano. O Prophet tem a menor média, e a combinação, a segunda menor, com desvio-padrão inferior ao
 do SARIMAX.
@@ -420,7 +424,6 @@ do SARIMAX.
 \input{tables/tab_reg_dm.tex}
 \end{table}
 
-% TODO (revisão): conferir o n dos testes -- 2009--2015 tem cerca de 365 semanas, não 410.
 \textbf{Análise de resíduos.} A Tabela~\ref{tab:res} e a Fig.~\ref{fig:res} avaliam as
 premissas usando os resíduos dentro da amostra, sem o primeiro ano. No SARIMAX, não se rejeita a média nula
 ($p=0{,}89$) nem se detecta autocorrelação (Ljung--Box~\cite{ljung1978measure} com 10 e 52
@@ -428,7 +431,7 @@ defasagens: $p=0{,}60$ e $0{,}26$) ou heterocedasticidade condicional
 (ARCH-LM~\cite{engle1982arch}: $p=0{,}75$). A normalidade é rejeitada
 (Jarque--Bera~\cite{jarque1980efficient} e Shapiro--Wilk~\cite{shapiro1965analysis}): o gráfico Q-Q mostra centro gaussiano e alguns pontos na cauda direita,
 correspondentes a ondas de calor como a de fevereiro de 2011, cuja semana teve média de
-34,9\,°C. Com $n\approx410$, os testes detectam desvios pequenos, e o efeito prático é modesto
+34,9\,°C. Com $n=360$ semanas, os testes detectam desvios pequenos, e o efeito prático é modesto
 (cobertura de 93,6\% no teste). Já os resíduos do Prophet são autocorrelacionados ($p<0{,}001$):
 o modelo descreve apenas tendência e sazonalidade e deixa a persistência de curto prazo no erro.
 
@@ -469,6 +472,24 @@ treino; só depois ele foi aplicado ao teste.
 \input{tables/tab_clf_hiperparametros.tex}
 \end{table*}
 
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=\textwidth]{clf_roc_pr.pdf}
+\caption{(a) Curvas ROC e (b) curvas precisão--revocação no conjunto de teste. Os pontos marcam
+o limiar escolhido para cada modelo; as linhas pontilhadas são o classificador aleatório e a prevalência.}
+\label{fig:roc}
+\end{figure*}
+
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=\textwidth]{clf_importancia.pdf}
+\caption{(a) Importância por permutação no teste (queda de ROC-AUC, média $\pm$ desvio em 5
+repetições) do LightGBM. (b) Os 15 maiores coeficientes da regressão logística, sobre
+preditores padronizados: azul aumenta e laranja reduz a probabilidade de chuva.}
+\label{fig:imp}
+\end{figure*}
+
+
 \subsection{Resultados da classificação}
 
 \textbf{Validação cruzada.} A variação entre dobras é pequena (desvio-padrão $\le0{,}003$ na
@@ -493,6 +514,15 @@ concentra as probabilidades da classe minoritária abaixo de 0,5. Por isso o aju
 \label{fig:cv}
 \end{figure}
 
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{clf_calibracao.pdf}
+\caption{Curvas de confiabilidade no teste (10 \textit{bins} por quantil). Pontos abaixo da
+diagonal indicam probabilidades superestimadas.}
+\label{fig:calib}
+\end{figure}
+
+
 \textbf{Teste temporal.} O LightGBM venceu em todas as métricas de discriminação
 (Tabela~\ref{tab:clf_teste}): ROC-AUC de 0,889, com IC~95\% por
 \textit{bootstrap}~\cite{efron1979bootstrap} de [0,884; 0,893], PR-AUC de 0,752 e F1 de 0,674.
@@ -514,13 +544,6 @@ treino e validação.
 \resizebox{\columnwidth}{!}{\input{tables/tab_clf_teste.tex}}
 \end{table}
 
-\begin{figure*}[!t]
-\centering
-\includegraphics[width=\textwidth]{clf_roc_pr.pdf}
-\caption{(a) Curvas ROC e (b) curvas precisão--revocação no conjunto de teste. Os pontos marcam
-o limiar escolhido para cada modelo; as linhas pontilhadas são o classificador aleatório e a prevalência.}
-\label{fig:roc}
-\end{figure*}
 
 \textbf{Matriz de confusão.} Com o limiar ótimo de 0,57, o LightGBM identifica 4.207 dos
 5.946 dias com chuva (revocação de 70,8\%), acerta 64,3\% das vezes em que prevê chuva
@@ -548,29 +571,14 @@ variáveis correlacionadas entre si (por exemplo, \texttt{Humidity3pm} e
 Na logística, um desvio-padrão a mais de rajada multiplica a chance de chuva por 1,88, e um a
 mais de umidade às 15h, por 1,65.
 
-\begin{figure*}[!t]
-\centering
-\includegraphics[width=\textwidth]{clf_importancia.pdf}
-\caption{(a) Importância por permutação no teste (queda de ROC-AUC, média $\pm$ desvio em 5
-repetições) do LightGBM. (b) Os 15 maiores coeficientes da regressão logística, sobre
-preditores padronizados: azul aumenta e laranja reduz a probabilidade de chuva.}
-\label{fig:imp}
-\end{figure*}
 
 \textbf{Calibração.} A logística e o LightGBM, treinados com pesos de classe,
 superestimam a probabilidade de chuva (Fig.~\ref{fig:calib}), efeito esperado da
-reponderação. A Random Forest, embora também ponderada, fica levemente abaixo da diagonal,
-pois a média dos votos das árvores comprime as probabilidades, o mesmo efeito que leva seu
+reponderação. A Random Forest, embora também ponderada, fica acima da diagonal, como o KNN, ou seja, subestima a
+probabilidade, pois a média dos votos das árvores comprime as probabilidades, o mesmo efeito que leva seu
 limiar ótimo a 0,32. Isso não afeta a AUC nem o F1 com limiar ajustado, mas explica por que o escore
 de Brier~\cite{brier1950verification} do LightGBM (0,122) é pior que o da Random Forest (0,108).
 
-\begin{figure}[!t]
-\centering
-\includegraphics[width=\columnwidth]{clf_calibracao.pdf}
-\caption{Curvas de confiabilidade no teste (10 \textit{bins} por quantil). Pontos abaixo da
-diagonal indicam probabilidades superestimadas.}
-\label{fig:calib}
-\end{figure}
 
 % ===========================================================================
 \section{Discussão e conclusão}\label{sec:disc}

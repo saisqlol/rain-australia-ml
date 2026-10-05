@@ -110,5 +110,5 @@ TempRange       0.003696  0.000728
 -- http://www.michaelshell.org/tex/ieeetran/bibtex/
 -- See the "IEEEtran_bst_HOWTO.pdf" manual for usage information.
 Done.
-[report] PDF gerado
+[report] PDF gerado.
 Concluído em 24.9 min.
